@@ -6,17 +6,13 @@ import './App.css';
 // negative powers of two - would require floats
 // priority for errors on most recent input?
 
-// * clean up: *
-// tests
-// refactor for loops
-// refactor to make better organization
-// css
+// * future improvements *
+// timer on inputs so that it doesn't check until user is done typing
+// get rid of duplicates in potential chains
+
+// * clean up now: *
 // insecure inputs?
 // browser issues with any of the js i'm using?
-
-const errorStyle = {
-  border: '2px solid red'
-};
 
 class PowersOfTwo extends React.Component {
   constructor(props) {
@@ -52,14 +48,14 @@ class PowersOfTwo extends React.Component {
   findAllChainsToCheck(valuesList) {
     // create "potential chains" for each non empty valid element
     const potentialChains = [];
-    for (var i = 0; i < 5; i++) {
-      // if element is non empty and valid power of 2
-      if (this.isValidPowerOfTwo(valuesList[i])) {
-        const hypotheticalChain = ['', '', '', '', ''];
+    
+    valuesList.map((value, idx) => {
+      if (this.isValidPowerOfTwo(value)) {
         // make a list around that item
-        hypotheticalChain[i] = valuesList[i];
-        // loop to the left, divide by two until i = 0
-        for (var j = i - 1; j >= 0; j--) {
+        const hypotheticalChain = ['', '', '', '', ''];
+        hypotheticalChain[idx] = value;
+        // loop to the left, divide by two until idx = 0
+        for (var j = idx - 1; j >= 0; j--) {
           const fullNum = parseInt(hypotheticalChain[j+1]);
           const halfNum = String(fullNum/2);
           hypotheticalChain[j] = halfNum;
@@ -67,16 +63,16 @@ class PowersOfTwo extends React.Component {
         // only move forward if beginning of chain is an integer
         const first = parseInt(hypotheticalChain[0]);
         if (first !== 0 && Number.isInteger(first)) {
-          // loop to the right, multiply by two until i = 4
-          for (var j = i; j < 4; j++) {
+          // loop to the right, multiply by two until idx = 4
+          for (var j = idx; j < 4; j++) {
             const num = parseInt(hypotheticalChain[j]);
             const doubleNum = num * 2;
             hypotheticalChain[j+1] = String(doubleNum);
           }
-          potentialChains.push(hypotheticalChain);          
+          potentialChains.push(hypotheticalChain);
         }
       }
-    }
+    });
     return potentialChains;  
   }
 
@@ -89,23 +85,21 @@ class PowersOfTwo extends React.Component {
     // figure out which chain has the least mismatches
     let lowestMismatchCount = 5;
     let bestContenderErrors;
-    for (var i = 0; i < potentialChains.length; i++) {
-      // how many mismatches for this chain
-      const chain = potentialChains[i];
+    
+    potentialChains.map((chain) => {
       let currentErrorCount = 0;
-      const currentErrors = [0, 0, 0, 0, 0] ;
-      for (var j = 0; j < 5; j++) {
-        if (valuesList[j] != chain[j] && valuesList[j] !== '') {
-          currentErrorCount += 1;
-          currentErrors[j] = 1;
-        }
-      }
+      // how many mismatches for this chain
+      const currentErrors = chain.map((item, idx) => {
+        return (valuesList[idx] != item && valuesList[idx] !== '') ? 1 : 0;
+      });
+      currentErrorCount = currentErrors.filter((x) => {return x === 1}).length;
+      // is this chain better than any previous ones?
       if (currentErrorCount < lowestMismatchCount) {
         lowestMismatchCount = currentErrorCount;
         bestContenderErrors = currentErrors;
       }
-    }
-    // return mismatches for that chain
+    });
+    // return mismatches for best chain
     return bestContenderErrors;
   }
 
@@ -130,17 +124,19 @@ class PowersOfTwo extends React.Component {
     const errors = this.state.errors;
     return (
       <form>
-        <h4>My favorite powers of two</h4>
-        {[0, 1, 2, 3, 4].map((i) => {
-          return <input
-            style={errors[i] ? errorStyle : {} }
-            type="text"
-            id={i}
-            key={i}
-            onChange={this.handleChange}
-          />
-        })}
-        <button onClick={this.clearAll}>Clear</button>
+        <h1 className="header-title">My favorite powers of two</h1>
+        <div className="main-content">
+          {[0, 1, 2, 3, 4].map((i) => {
+            return <input
+              className={errors[i] ? 'errored' : null }
+              type="text"
+              id={i}
+              key={i}
+              onChange={this.handleChange}
+            />
+          })}
+          <button className='clear-btn' onClick={this.clearAll}>Clear All</button>
+        </div>
       </form>
     );
   }
