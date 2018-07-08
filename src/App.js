@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.css';
 
 // NOTES
@@ -15,7 +15,6 @@ import './App.css';
 // insecure inputs?
 // browser issues with any of the js i'm using?
 
-
 const errorStyle = {
   border: '2px solid red'
 };
@@ -25,9 +24,9 @@ class PowersOfTwo extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.clearAll = this.clearAll.bind(this);
-    this._isValidPowerOfTwo = this._isValidPowerOfTwo.bind(this);
-    this._findAllChainsToCheck = this._findAllChainsToCheck.bind(this);
-    this._checkPotentialsForErrors = this._checkPotentialsForErrors.bind(this);
+    this.isValidPowerOfTwo = this.isValidPowerOfTwo.bind(this);
+    this.findAllChainsToCheck = this.findAllChainsToCheck.bind(this);
+    this.checkPotentialsForErrors = this.checkPotentialsForErrors.bind(this);
     this.state = {
       // errors - a list of 0s and 1s to indicate which input fields should show error state
       errors: [0, 0, 0, 0, 0],
@@ -36,13 +35,13 @@ class PowersOfTwo extends React.Component {
     };
   }
 
-  _isValidPowerOfTwo(number) {
+  isValidPowerOfTwo(number) {
     if (isNaN(number)) {
       return false;
     }
     // note: 1 is the only positive power of two that doesn't work with the
     // binary chop method below
-    if (number == 1) {
+    if (number === '1') {
       return true;
     }
     // make number binary, chop off the first 1, see if the remaining digits are zero
@@ -51,12 +50,12 @@ class PowersOfTwo extends React.Component {
     return choppedBinary === 0;
   }
 
-  _findAllChainsToCheck(valuesList) {
+  findAllChainsToCheck(valuesList) {
     // create "potential chains" for each non empty valid element
     const potentialChains = [];
     for (var i = 0; i < 5; i++) {
       // if element is non empty and valid power of 2
-      if (this._isValidPowerOfTwo(valuesList[i])) {
+      if (this.isValidPowerOfTwo(valuesList[i])) {
         const hypotheticalChain = ['', '', '', '', ''];
         // make a list around that item
         hypotheticalChain[i] = valuesList[i];
@@ -68,7 +67,7 @@ class PowersOfTwo extends React.Component {
         }
         // only move forward if beginning of chain is an integer
         const first = parseInt(hypotheticalChain[0]);
-        if (first != 0 && Number.isInteger(first)) {
+        if (first !== 0 && Number.isInteger(first)) {
           // loop to the right, multiply by two until i = 4
           for (var j = i; j < 4; j++) {
             const num = parseInt(hypotheticalChain[j]);
@@ -82,15 +81,14 @@ class PowersOfTwo extends React.Component {
     return potentialChains;  
   }
 
-  _checkPotentialsForErrors(potentialChains, valuesList) {
-    if (potentialChains.length == 0) {
+  checkPotentialsForErrors(potentialChains, valuesList) {
+    if (potentialChains.length === 0) {
       // if no valid chains, return non-empty inputs as errors
       return valuesList.map(x => (x === '' ? 0 : 1));
     }
     // figure out how many mismatches there are for each chain,
     // figure out which chain has the least mismatches
     let lowestMismatchCount = 5;
-    let bestContenderChain = 0;
     let bestContenderErrors;
     for (var i = 0; i < potentialChains.length; i++) {
       // how many mismatches for this chain
@@ -103,37 +101,28 @@ class PowersOfTwo extends React.Component {
           currentErrors[j] = 1;
         }
       }
-      // console.log('chain', chain);
-      // console.log('currentErrors', currentErrors);
-      // console.log('currentErrorCount', currentErrorCount);
       if (currentErrorCount < lowestMismatchCount) {
         lowestMismatchCount = currentErrorCount;
-        bestContenderChain = i;
         bestContenderErrors = currentErrors;
       }
     }
-    // console.log('lowestMismatchCount', lowestMismatchCount);
-    // console.log('bestContenderChain', bestContenderChain);
-    // console.log('bestContenderErrors', bestContenderErrors);
     // return mismatches for that chain
     return bestContenderErrors;
   }
 
   handleChange() {
-    // todo: security on inputs
     const currentVals = [0, 1, 2, 3, 4].map((i) => {
       return document.getElementById(i).value;
     });
-    const potentialChains = this._findAllChainsToCheck(currentVals);
-    // console.log(currentVals);
-    const errors = this._checkPotentialsForErrors(potentialChains, currentVals);
+    const potentialChains = this.findAllChainsToCheck(currentVals);
+    const errors = this.checkPotentialsForErrors(potentialChains, currentVals);
     this.setState(() => {
       return {errors};
     })
   }
 
   clearAll() {
-    this.setState(() => {
+    this.setState({
       valuesList: ['', '', '', '', '']
     })
   }
@@ -159,5 +148,3 @@ class PowersOfTwo extends React.Component {
 }
 
 export default PowersOfTwo
-// ReactDOM.render(<PowersOfTwo />, document.getElementById('app'));
-
