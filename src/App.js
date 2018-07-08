@@ -7,11 +7,10 @@ import './App.css';
 // priority for errors on most recent input?
 
 // * clean up: *
-// for loops
+// tests
+// refactor for loops
 // refactor to make better organization
 // css
-// console logs
-// tests
 // insecure inputs?
 // browser issues with any of the js i'm using?
 
