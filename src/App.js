@@ -9,10 +9,10 @@ import './App.css';
 // * future improvements *
 // timer on inputs so that it doesn't check until user is done typing
 // get rid of duplicates in potential chains
+// fix compatibility with ie10 - `Set is not defined` (problem with create react app)
 
 // * clean up now: *
 // insecure inputs?
-// browser issues with any of the js i'm using?
 
 class PowersOfTwo extends React.Component {
   constructor(props) {
@@ -40,8 +40,8 @@ class PowersOfTwo extends React.Component {
       return true;
     }
     // make number binary, chop off the first 1, see if the remaining digits are zero
-    const binary = parseInt(number).toString(2);
-    const choppedBinary = parseInt(binary.substring(1));
+    const binary = parseInt(number, 0).toString(2);
+    const choppedBinary = parseInt(binary.substring(1), 0);
     return choppedBinary === 0;
   }
 
@@ -49,25 +49,25 @@ class PowersOfTwo extends React.Component {
     // create "potential chains" for each non empty valid element
     const potentialChains = [];
     
-    valuesList.map((value, idx) => {
+    valuesList.map((value, idx) => { // eslint-disable-line
       if (this.isValidPowerOfTwo(value)) {
         // make a list around that item
         const hypotheticalChain = ['', '', '', '', ''];
         hypotheticalChain[idx] = value;
         // loop to the left, divide by two until idx = 0
         for (var j = idx - 1; j >= 0; j--) {
-          const fullNum = parseInt(hypotheticalChain[j+1]);
+          const fullNum = parseInt(hypotheticalChain[j+1], 0);
           const halfNum = String(fullNum/2);
           hypotheticalChain[j] = halfNum;
         }
         // only move forward if beginning of chain is an integer
-        const first = parseInt(hypotheticalChain[0]);
+        const first = parseInt(hypotheticalChain[0]); // eslint-disable-line
         if (first !== 0 && Number.isInteger(first)) {
           // loop to the right, multiply by two until idx = 4
-          for (var j = idx; j < 4; j++) {
-            const num = parseInt(hypotheticalChain[j]);
+          for (var k = idx; k < 4; k++) {
+            const num = parseInt(hypotheticalChain[k], 0);
             const doubleNum = num * 2;
-            hypotheticalChain[j+1] = String(doubleNum);
+            hypotheticalChain[k+1] = String(doubleNum);
           }
           potentialChains.push(hypotheticalChain);
         }
@@ -86,11 +86,11 @@ class PowersOfTwo extends React.Component {
     let lowestMismatchCount = 5;
     let bestContenderErrors;
     
-    potentialChains.map((chain) => {
+    potentialChains.map((chain) => { // eslint-disable-line
       let currentErrorCount = 0;
       // how many mismatches for this chain
       const currentErrors = chain.map((item, idx) => {
-        return (valuesList[idx] != item && valuesList[idx] !== '') ? 1 : 0;
+        return (valuesList[idx] !== item && valuesList[idx] !== '') ? 1 : 0;
       });
       currentErrorCount = currentErrors.filter((x) => {return x === 1}).length;
       // is this chain better than any previous ones?
