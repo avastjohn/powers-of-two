@@ -11,9 +11,6 @@ import './App.css';
 // get rid of duplicates in potential chains
 // fix compatibility with ie10 - `Set is not defined` (problem with create react app)
 
-// * clean up now: *
-// insecure inputs?
-
 class PowersOfTwo extends React.Component {
   constructor(props) {
     super(props);
