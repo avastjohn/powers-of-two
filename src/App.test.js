@@ -18,36 +18,50 @@ it('should determine valid powers of two', () => {
   });
 });
 
+const testCases = [
+  {
+    valuesList: ['', '2', '', '', '32'],
+    potentials: [[ '1', '2', '4', '8', '16' ], [ '2', '4', '8', '16', '32' ]],
+    bestErrors: [0, 0, 0, 0, 1]
+  },
+  {
+    valuesList: ['', '5', '', '', '32'],
+    potentials: [["2", "4", "8", "16", "32"]],
+    bestErrors: [0, 1, 0, 0, 0]
+  },
+  {
+    valuesList: ['', '', '', '', ''],
+    potentials: [],
+    bestErrors: [0, 0, 0, 0, 0]
+  },
+  {
+    valuesList: ['', '', '2', '', ''],
+    potentials: [],
+    bestErrors: [0, 0, 1, 0, 0]
+  },
+  {
+    valuesList: ['2', '', '32', '64', ''],
+    potentials: [["2", "4", "8", "16", "32"], ["8", "16", "32", "64", "128"], ["8", "16", "32", "64", "128"]],
+    bestErrors: [1, 0, 0, 0, 0]
+  },
+  {
+    valuesList: ['5', '', '7', '8', ''],
+    potentials: [['1', '2', '4', '8', '16']],
+    bestErrors: [1, 0, 1, 0, 0]
+  },
+]
+
 it('should find all chains to check', () => {
-  const testCases = [
-    {
-      valuesList: ['', '2', '', '', '32'],
-      expected: [[ '1', '2', '4', '8', '16' ], [ '2', '4', '8', '16', '32' ]]
-    },
-    {
-      valuesList: ['', '5', '', '', '32'],
-      expected: [["2", "4", "8", "16", "32"]]
-    },
-    {
-      valuesList: ['', '', '', '', ''],
-      expected: []
-    },
-    {
-      valuesList: ['', '', '2', '', ''],
-      expected: []
-    },
-    {
-      valuesList: ['2', '', '32', '64', ''],
-      expected: [["2", "4", "8", "16", "32"], ["8", "16", "32", "64", "128"], ["8", "16", "32", "64", "128"]]
-    },
-  ]
   testCases.map((testCase) => {
     const output = testComponent.findAllChainsToCheck(testCase.valuesList);
-    expect(output).toEqual(testCase.expected);
+    expect(output).toEqual(testCase.potentials);
   });
 });
 
-it('should check potential chains for errors', () => {
-
+it('should check potential chains for best errors output', () => {
+  testCases.map((testCase) => {
+    const output = testComponent.checkPotentialsForErrors(testCase.potentials, testCase.valuesList);
+    expect(output).toEqual(testCase.bestErrors);
+  });
 });
 
